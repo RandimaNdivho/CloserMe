@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLIDE — Student Community Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ================= AUTHENTICATION SCREEN ================= -->
+  <div id="authScreen" class="auth-container">
+    <div class="auth-card">
+      <h1>SLIDE</h1>
+      <p>Connect with your verified campus community.</p>
+      
+      <form id="loginForm">
+        
+        <!-- School Selector -->
+        <div class="form-group">
+          <label for="schoolSelect">Select Institution</label>
+          <select id="schoolSelect" required>
+            <option value="" disabled selected>Select your university</option>
+            <option value="RI.ac.za">Rosebank International (RI.ac.za)</option>
+            <option value="wits.ac.za">Wits University (wits.ac.za)</option>
+            <option value="up.ac.za">University of Pretoria (up.ac.za)</option>
+            <option value="uj.ac.za">University of Johannesburg (uj.ac.za)</option>
+            <option value="uct.ac.za">University of Cape Town (uct.ac.za)</option>
+            <optgroup label="Other Institutions">
+              <option value="other">Other (Enter your institutional email)</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Student Identifier Input -->
+        <div class="form-group">
+          <label for="studentNum">Student Number or Institutional Email</label>
+          <input type="text" id="studentNum" placeholder="e.g., ST10472449 or student@RI.ac.za" required>
+          <small id="loginHint" style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">
+            Format: 'ST' + 8-10 digits (e.g., ST10472449) OR your exact school email ending with your selected institution's domain.
+          </small>
+          <span id="loginError" class="error-msg" style="display:none; color:#E53E3E; font-size:12px; margin-top:4px;"></span>
+        </div>
+
+        <button type="submit" class="btn-primary">Enter Campus Feed</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MAIN APP SHELL ================= -->
+  <div id="appShell" class="app-shell">
+    
+    <!-- HEADER -->
+     <header class="app-header">
+    <div onclick="toggleResNights()" style="cursor: pointer; display: flex; flex-direction: column; align-items: flex-start;">
+        <span class="logo-btn" style="font-size: 20px; font-weight: 800; line-height: 1.1;">SLIDE</span>
+        <span id="logoSubtitle" style="font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 1px;">Tap to switch to Res Nights</span>
+    </div>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search institutions, students, or campus activities...">
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openCreateModal()" title="Create Post or Activity">+</button>
+        <button class="icon-btn" onclick="toggleNotifications()" title="Notifications">🔔</button>
+        <button class="icon-btn" onclick="openProfile()" title="User Profile">👤</button>
+      </div>
+    </header>
+
+    <!-- FEED CONTAINER -->
+    <main class="main-container">
+      
+      <!-- Create Prompt Trigger -->
+      <div class="create-prompt" onclick="openCreateModal()">
+        <img src="js\Assets\Me.jpg" alt="Close-up selfie of a person wearing a black head covering, looking upward with wide eyes and pursed lips. The dim indoor background and exaggerated expression give the image a playful tone.">
+        <span>What's happening on campus today? Share a post or activity...</span>
+      </div>
+
+      <!-- Live Dynamic Post Feed -->
+      <div id="feedStream">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+    </main>
+
+  </div>
+  <!-- ================= NOTIFICATIONS MODAL ================= -->
+  <div id="notificationModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div class="modal-card" style="background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 440px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
+      
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
+        <h4 style="font-size: 16px; font-weight: 700;">Your Notifications</h4>
+        <button onclick="closeNotificationModal()" style="background:none; border:none; color:var(--text-main); cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
+      </div>
+
+      <!-- Notification List Stream -->
+      <div style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto;">
+        
+        <!-- Notification Item 1 -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 18px;">👋</span>
+          <div style="flex: 1;">
+            <p style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">Tefelo Mathabe & 11 others waved at your post</p>
+            <p style="font-size: 11px; color: var(--text-muted);">Working on the SLIDE interface prototype...</p>
+          </div>
+          <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap;">2m ago</span>
+        </div>
+
+        <!-- Notification Item 2 -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 18px;">📍</span>
+          <div style="flex: 1;">
+            <p style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">Activity Reminder: 5-a-Side Soccer</p>
+            <p style="font-size: 11px; color: var(--text-muted);">Res Quad Turf starting this Friday afternoon.</p>
+          </div>
+          <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap;">1h ago</span>
+        </div>
+
+        <!-- Notification Item 3 -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 18px;">⚡</span>
+          <div style="flex: 1;">
+            <p style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">System Boost Active</p>
+            <p style="font-size: 11px; color: var(--text-muted);">Your post has priority campus visibility for 20 mins.</p>
+          </div>
+          <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap;">3h ago</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= USER PROFILE MODAL ================= -->
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
+        <h4 id="profileModalTitle">Student Profile</h4>
+        <button onclick="closeProfileModal()" style="background:none; border:none; color:var(--text-main); cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
+      </div>
+      
+      <!-- Profile Header Info -->
+      <div id="profileHeaderInfo" style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Interests & Tags -->
+      <div id="profileInterests" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Tabs: Posts | Activities -->
+      <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px;">
+        <button id="tabPostsBtn" onclick="switchProfileTab('posts')" style="flex:1; background:none; border:none; padding:10px; font-weight:600; cursor:pointer; color:var(--accent); border-bottom: 2px solid var(--accent);">Posts</button>
+        <button id="tabActsBtn" onclick="switchProfileTab('activities')" style="flex:1; background:none; border:none; padding:10px; font-weight:600; cursor:pointer; color:var(--text-muted);">Activities</button>
+      </div>
+
+      <!-- Tab Content Stream -->
+      <div id="profileTabContent" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; max-height: 300px; padding-right: 4px;">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CREATE POST / ACTIVITY MODAL ================= -->
+  <div id="createModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3>Create Campus Content</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">Share a visual moment or organize a student activity.</p>
+      
+      <form id="createForm">
+        <div class="form-group">
+          <label>ContentType</label>
+          <select id="contentType" onchange="toggleActivityFields()">
+            <option value="post">Standard Post</option>
+            <option value="activity">Campus Activity (Joinable Event)</option>
+          </select>
+        </div>
+
+     <!-- Inside your create post form modal -->
+     <div class="form-group" style="margin-bottom: 12px;">
+        <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Upload Image from Device</label>
+        <input type="file" id="postImageFile" accept="image/*" style="width: 100%; padding: 8px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: var(--text-main); cursor: pointer;">
+     </div>
+
+        <div class="form-group">
+          <label>Caption / Description</label>
+          <textarea id="postCaption" rows="3" placeholder="What are you sharing with your student community?" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); color:var(--text-main); border-radius:6px;" required></textarea>
+        </div>
+
+        <!-- Dynamic Activity Fields -->
+        <div id="activityExtraFields" style="display:none; background:var(--bg-secondary); padding:12px; border-radius:6px; margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:11px;">Event Venue / Location</label>
+            <input type="text" id="activityVenue" placeholder="e.g. Library Lab 3 or Res Quad">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:11px;">Max Attendees</label>
+            <input type="number" id="activityLimit" placeholder="e.g. 20">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" class="action-btn" style="flex:1; justify-content:center;" onclick="closeCreateModal()">Cancel</button>
+          <button type="submit" class="btn-primary" style="flex:1;">Share to Feed</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= PRIVATE CHAT MODAL ================= -->
+  <div id="chatModal" class="modal-overlay">
+    <div class="modal-card" style="max-width:400px; height:500px; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px;">
+        <h4 id="chatRecipientName">Private SLIDE Chat</h4>
+        <button onclick="closeChat()" style="background:none; border:none; color:var(--text-main); cursor:pointer; font-weight:bold;">✕</button>
+      </div>
+      <div id="chatMessages" style="flex:1; overflow-y:auto; padding:12px 0; display:flex; flex-direction:column; gap:8px;">
+        <!-- Chat bubbles rendered here -->
+      </div>
+      <div style="display:flex; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
+        <input type="text" id="chatInput" placeholder="Type a private message..." style="flex:1; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg-primary); color:var(--text-main);">
+        <button class="btn-primary" style="width:auto; padding:8px 16px;" onclick="sendChatMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+<div id="toastNotification" style="position: fixed; bottom: 20px; right: 20px; background: var(--text-main,#111); color: var(--bg-main,#fff); padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;"></div>
+  <!-- JAVASCRIPT MODULE ENTRY POINT -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

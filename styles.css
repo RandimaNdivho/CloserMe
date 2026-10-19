@@ -1,0 +1,463 @@
+/* =================================================================ج
+   SLIDE DESIGN SYSTEM & TOKENS (WCAG 2.1 Level AA Compliant)
+   ================================================================= */
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F7FAFC;
+  --surface: #FFFFFF;
+  --text-main: #1A202C;
+  --text-muted: #4A5568;
+  --accent: #3182CE;
+  --accent-hover: #2B6CB0;
+  --success: #38A169;
+  --border: #E2E8F0;
+  --focus-ring: 3px solid #3182CE;
+  --transition: all 0.25s ease;
+}
+
+[data-theme="res-nights"] {
+  --bg-primary: #0B0E14;
+  --bg-secondary: #121824;
+  --surface: #1A202C;
+  --text-main: #F7FAFC;
+  --text-muted: #A0AEC0;
+  --accent: #9F7AEA;
+  --accent-hover: #805AD5;
+  --success: #48BB78;
+  --border: #2D3748;
+  --focus-ring: 3px solid #9F7AEA;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  line-height: 1.5;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Accessibility Focus States */
+button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* =================================================================
+   AUTH SCREEN (Login & Registration)
+   ================================================================= */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--bg-secondary);
+  padding: 16px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 32px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.auth-card h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  color: var(--accent);
+}
+
+.auth-card p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.error-msg {
+  color: #E53E3E;
+  font-size: 12px;
+  margin-top: 4px;
+  display: none;
+}
+
+.btn-primary {
+  width: 100%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+/* =================================================================
+   MAIN APP SHELL (Header & Feed Layout)
+   ================================================================= */
+.app-shell {
+  display: none; /* Toggled via JS upon login */
+  min-height: 100vh;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  height: 64px;
+}
+
+.logo-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 24px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 8px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+/* =================================================================
+   MAIN FEED & POST CARDS
+   ================================================================= */
+.main-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.create-prompt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+
+.create-prompt img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.create-prompt span {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.user-meta {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.user-meta img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.user-meta h4 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.user-meta span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.post-img-container {
+  width: 100%;
+  max-height: 450px;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.post-img-container img {
+  width: 100%;
+  max-height: 450px;
+  object-fit: cover;
+}
+
+.post-body {
+  padding: 14px 16px;
+}
+
+.post-body p {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.post-actions {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+  padding: 10px 16px;
+  background: var(--bg-secondary);
+}
+
+.action-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-main);
+  transition: var(--transition);
+}
+
+.action-btn.joined {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+/* =================================================================
+   MODALS & TOAST NOTIFICATIONS
+   ================================================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 13px;
+  font-weight: 600;
+  display: none;
+  z-index: 2000;
+}
+/* Main Header Navigation Container */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  width: 100%;
+  box-sizing: border-box;
+  flex-wrap: nowrap; /* Prevents items from dropping to a second line */
+}
+
+/* Logo & Subtitle Wrapper */
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  cursor: pointer;
+  white-space: nowrap; /* Keeps 'SLIDE // RES NIGHTS' from breaking mid-word */
+  flex-shrink: 0;      /* Prevents the logo from getting squished */
+}
+
+.logo-title {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.logo-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* Search Bar Area */
+.search-container {
+  flex: 1; /* Allows search bar to scale smoothly */
+  max-width: 450px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+/* Action Icons Right Side */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+/* =========================================
+   RESPONSIVE DESIGN (MOBILE & TABLET VIEW)
+========================================= */
+
+@media (max-width: 768px) {
+  /* Stack the top header on mobile screens */
+  .app-header, header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 10px 14px !important;
+  }
+
+  /* Make search bar full width */
+  .search-container {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Align action icons to the right */
+  .header-actions {
+    justify-content: flex-end !important;
+  }
+
+  /* Make modals fit nicely on mobile screens without overflowing */
+  .modal-card {
+    width: 92% !important;
+    max-width: 92% !important;
+    max-height: 85vh !important;
+    padding: 16px !important;
+    margin: 0 auto;
+  }
+
+  /* Adjust feed stream padding for smaller viewports */
+  .feed-container, #feedStream {
+    padding: 0 4px;
+  }
+
+  /* Remove side borders on post cards for edge-to-edge mobile feel */
+  .post-card {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+  }
+}
