@@ -1,232 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SLIDE — Student Community Platform</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SLIDE — Verified Campus Social & Activity Platform</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="day-mode">
+  <div id="toast-container" aria-live="polite"></div>
 
-  <!-- ================= AUTHENTICATION SCREEN ================= -->
-  <div id="authScreen" class="auth-container">
+  <!-- 1. AUTHENTICATION SCREEN (Starts active, zero preset credentials) -->
+  <section id="auth-screen" class="screen active">
     <div class="auth-card">
-      <h1>SLIDE</h1>
-      <p>Connect with your verified campus community.</p>
-      
-      <form id="loginForm">
-        
-        <!-- School Selector -->
-        <div class="form-group">
-          <label for="schoolSelect">Select Institution</label>
-          <select id="schoolSelect" required>
-            <option value="" disabled selected>Select your university</option>
-            <option value="RI.ac.za">Rosebank International (RI.ac.za)</option>
-            <option value="wits.ac.za">Wits University (wits.ac.za)</option>
-            <option value="up.ac.za">University of Pretoria (up.ac.za)</option>
-            <option value="uj.ac.za">University of Johannesburg (uj.ac.za)</option>
-            <option value="uct.ac.za">University of Cape Town (uct.ac.za)</option>
-            <optgroup label="Other Institutions">
-              <option value="other">Other (Enter your institutional email)</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <!-- Student Identifier Input -->
-        <div class="form-group">
-          <label for="studentNum">Student Number or Institutional Email</label>
-          <input type="text" id="studentNum" placeholder="e.g., ST10472449 or student@RI.ac.za" required>
-          <small id="loginHint" style="display:block; font-size:11px; color:var(--text-muted); margin-top:4px;">
-            Format: 'ST' + 8-10 digits (e.g., ST10472449) OR your exact school email ending with your selected institution's domain.
-          </small>
-          <span id="loginError" class="error-msg" style="display:none; color:#E53E3E; font-size:12px; margin-top:4px;"></span>
-        </div>
-
-        <button type="submit" class="btn-primary">Enter Campus Feed</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ================= MAIN APP SHELL ================= -->
-  <div id="appShell" class="app-shell">
-    
-    <!-- HEADER -->
-     <header class="app-header">
-    <div onclick="toggleResNights()" style="cursor: pointer; display: flex; flex-direction: column; align-items: flex-start;">
-        <span class="logo-btn" style="font-size: 20px; font-weight: 800; line-height: 1.1;">SLIDE</span>
-        <span id="logoSubtitle" style="font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 1px;">Tap to switch to Res Nights</span>
-    </div>
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search institutions, students, or campus activities...">
+      <div class="auth-brand">
+        <h1>SLIDE</h1>
+        <p class="subtitle">Verified Campus Communities • Zero Follower Clout</p>
       </div>
 
+      <div class="tab-switch">
+        <button id="tab-login" class="tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+        <button id="tab-signup" class="tab-btn" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-id">Username or Institutional Email</label>
+          <input type="text" id="login-id" placeholder="Enter your username or email" required />
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Password</label>
+          <div class="password-wrap">
+            <input type="password" id="login-pass" placeholder="Enter your password" required />
+            <button type="button" class="toggle-eye" onclick="togglePass('login-pass')">Show</button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary full-width">Sign In to Campus</button>
+        <p class="demo-hint">New to SLIDE? Switch to <strong>Create Account</strong> to register with your student email.</p>
+      </form>
+
+      <!-- SIGNUP FORM -->
+      <form id="signup-form" class="hidden" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label for="reg-username">Choose Username</label>
+          <input type="text" id="reg-username" placeholder="e.g., lerato_k" oninput="checkUsername(this.value)" required />
+          <small id="username-feedback" class="field-hint"></small>
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Institutional Email (.ac.za / .edu.za)</label>
+          <input type="email" id="reg-email" placeholder="student@university.ac.za" required />
+        </div>
+        <div class="form-group">
+          <label for="reg-dob">Date of Birth (Minimum Age: 16)</label>
+          <input type="date" id="reg-dob" required />
+        </div>
+        <div class="form-group">
+          <label for="reg-pass">Create Password</label>
+          <div class="password-wrap">
+            <input type="password" id="reg-pass" placeholder="Min 8 chars, 1 number, 1 symbol" oninput="checkPasswordStrength(this.value)" required />
+            <button type="button" class="toggle-eye" onclick="togglePass('reg-pass')">Show</button>
+          </div>
+          <div class="strength-meter"><div id="strength-bar"></div></div>
+          <small id="strength-text" class="field-hint"></small>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="reg-terms" required />
+            I accept the POPIA Privacy Policy & Campus Guidelines
+          </label>
+        </div>
+        <button type="submit" class="btn-primary full-width">Register & Continue to Onboarding</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 2. ONBOARDING WIZARD -->
+  <section id="onboarding-screen" class="screen">
+    <div class="auth-card">
+      <div class="onboarding-header">
+        <span class="badge-pill">Step <span id="ob-step-num">1</span> of 3</span>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="ob-step-1" class="ob-step">
+        <h2>Set Up Your Profile</h2>
+        <p>Personalize your verified student profile.</p>
+        <div class="form-group">
+          <label for="ob-avatar">Choose Profile Picture</label>
+          <select id="ob-avatar">
+            <option value="Assets/Me.jpg">Portrait 1 (Assets/Me.jpg)</option>
+            <option value="Assets/Black Girl.jpg">Portrait 2 (Assets/Black Girl.jpg)</option>
+            <option value="Assets/Jason.jpg">Portrait 3 (Assets/Jason.jpg)</option>
+            <option value="Assets/View Guy.jpg">Portrait 4 (Assets/View Guy.jpg)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ob-name">Full Display Name</label>
+          <input type="text" id="ob-name" placeholder="Enter your display name" required />
+        </div>
+        <div class="form-group">
+          <label for="ob-institution">Select Institution</label>
+          <select id="ob-institution">
+            <option value="University of Limpopo">University of Limpopo</option>
+            <option value="IIE Varsity College">IIE Varsity College</option>
+            <option value="University of Johannesburg">University of Johannesburg</option>
+            <option value="Wits University">Wits University</option>
+            <option value="University of Pretoria">University of Pretoria</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ob-course">Course / Field of Study</label>
+          <input type="text" id="ob-course" placeholder="e.g., BSc Computer Science" required />
+        </div>
+        <div class="form-group">
+          <label for="ob-bio">Short Bio</label>
+          <textarea id="ob-bio" rows="2" placeholder="What's your campus focus?"></textarea>
+        </div>
+        <button class="btn-primary full-width" onclick="nextOnboarding(2)">Next: Pick Interests</button>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="ob-step-2" class="ob-step hidden">
+        <h2>Your Campus Vibe</h2>
+        <p>Select interests to tailor your feed.</p>
+        <div class="interest-grid" id="ob-interests">
+          <button type="button" class="interest-chip" onclick="toggleChip(this)">Late Night Study</button>
+          <button type="button" class="interest-chip" onclick="toggleChip(this)">5-a-Side Football</button>
+          <button type="button" class="interest-chip" onclick="toggleChip(this)">Res Life</button>
+          <button type="button" class="interest-chip" onclick="toggleChip(this)">Tech & Coding</button>
+          <button type="button" class="interest-chip" onclick="toggleChip(this)">Streetwear</button>
+          <button type="button" class="interest-chip" onclick="toggleChip(this)">Gaming</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="nextOnboarding(1)">Back</button>
+          <button class="btn-primary" onclick="nextOnboarding(3)">Next: How SLIDE Works</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="ob-step-3" class="ob-step hidden">
+        <h2>SLIDE Signature Rules</h2>
+        <div class="feature-guide-list">
+          <div class="guide-item"><strong>👋 Wave:</strong> Private acknowledgement with zero public follower counts.</div>
+          <div class="guide-item"><strong>⚡ Boost:</strong> 15-minute spotlight pinning for urgent campus updates.</div>
+          <div class="guide-item"><strong>📍 Join Activity:</strong> Real-world campus meetups with live capacity caps.</div>
+        </div>
+        <button class="btn-primary full-width" onclick="finishOnboarding()">Enter SLIDE Feed</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. MAIN APP SHELL (Hidden until user authenticates) -->
+  <div id="app-shell" class="hidden">
+    <header class="top-header">
+      <button id="res-nights-toggle" class="brand-wordmark" onclick="toggleResNights()" title="Switch between SLIDE Day and SLIDE Res Nights">
+        SLIDE <span id="mode-badge" class="mode-pill">DAY</span>
+      </button>
       <div class="header-actions">
-        <button class="icon-btn" onclick="openCreateModal()" title="Create Post or Activity">+</button>
-        <button class="icon-btn" onclick="toggleNotifications()" title="Notifications">🔔</button>
-        <button class="icon-btn" onclick="openProfile()" title="User Profile">👤</button>
+        <button class="icon-btn" onclick="openView('messages-view')" title="Direct Messages">💬</button>
+        <button class="icon-btn" onclick="openAdminConsole()" title="Moderator & Admin Console">🛡️</button>
+        <button class="icon-btn" onclick="openModal('settings-modal')" title="Settings, Privacy & POPIA">⚙️</button>
       </div>
     </header>
 
-    <!-- FEED CONTAINER -->
-    <main class="main-container">
-      
-      <!-- Create Prompt Trigger -->
-      <div class="create-prompt" onclick="openCreateModal()">
-        <img src="js\Assets\Me.jpg" alt="Close-up selfie of a person wearing a black head covering, looking upward with wide eyes and pursed lips. The dim indoor background and exaggerated expression give the image a playful tone.">
-        <span>What's happening on campus today? Share a post or activity...</span>
-      </div>
+    <div id="res-nights-banner" class="res-banner hidden">
+      <span>🌙 <strong>SLIDE / RES NIGHTS</strong> — After-hours residence life, late library sessions & night socials.</span>
+      <button class="btn-small-light" onclick="toggleResNights()">Back to Day</button>
+    </div>
 
-      <!-- Live Dynamic Post Feed -->
-      <div id="feedStream">
-        <!-- Rendered dynamically via app.js -->
-      </div>
+    <main class="main-container">
+      <!-- HOME VIEW -->
+      <section id="home-view" class="app-view active">
+        <div class="stories-bar" id="stories-bar"></div>
+        <div class="feed-controls">
+          <div class="feed-tabs">
+            <button class="feed-tab active" onclick="setFeedFilter('all', this)">Campus Feed</button>
+            <button class="feed-tab" onclick="setFeedFilter('activities', this)">Activities Only</button>
+            <button class="feed-tab" onclick="setFeedFilter('saved', this)">Saved</button>
+          </div>
+          <button class="btn-text" onclick="renderFeed()">↻ Refresh</button>
+        </div>
+        <div id="boosted-banner-container"></div>
+        <div id="feed-stream" class="feed-stream"></div>
+      </section>
+
+      <!-- SEARCH VIEW -->
+      <section id="search-view" class="app-view hidden">
+        <div class="card-panel">
+          <h2>Discover Campus</h2>
+          <div class="search-box-wrap" style="margin-top:10px;">
+            <input type="text" id="global-search-input" placeholder="Search posts, institutions, or activities..." oninput="handleSearch(this.value)" />
+          </div>
+          <div id="search-results" class="search-results" style="margin-top:14px;"></div>
+        </div>
+      </section>
+
+      <!-- CREATE VIEW -->
+      <section id="create-view" class="app-view hidden">
+        <div class="card-panel">
+          <h2>Create on SLIDE</h2>
+          <div class="tab-switch">
+            <button id="create-type-post" class="tab-btn active" onclick="switchCreateType('post')">📸 Standard Post</button>
+            <button id="create-type-activity" class="tab-btn" onclick="switchCreateType('activity')">📍 Campus Activity</button>
+          </div>
+
+          <form id="create-form" onsubmit="publishContent(event)">
+            <div class="form-group">
+              <label for="post-media-preset">Select Campus Visual (Local Assets)</label>
+              <select id="post-media-preset">
+                <option value="Assets/5 Football.jpg">Campus 5-a-Side Turf (Assets/5 Football.jpg)</option>
+                <option value="Assets/Library.jpg">Library Study Pod (Assets/Library.jpg)</option>
+                <option value="Assets/RI.jpg">Campus Photography (Assets/RI.jpg)</option>
+                <option value="Assets/Girls Night.png">Res Nights Social (Assets/Girls Night.png)</option>
+                <option value="Assets/Drama.webp">Auditorium Stage (Assets/Drama.webp)</option>
+                <option value="Assets/Night View.webp">Late Night Campus View (Assets/Night View.webp)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="post-alt">Accessibility Alt Text (WCAG AA)</label>
+              <input type="text" id="post-alt" placeholder="Describe image for screen readers..." required />
+            </div>
+            <div class="form-group">
+              <label for="post-caption">Caption</label>
+              <textarea id="post-caption" rows="3" placeholder="What's happening on campus?" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="post-is-res-nights" /> Publish to <strong>SLIDE / Res Nights</strong>
+              </label>
+            </div>
+
+            <div id="activity-fields" class="hidden">
+              <hr class="divider" />
+              <h3>Activity Details</h3>
+              <div class="form-group">
+                <label for="act-title">Activity Title</label>
+                <input type="text" id="act-title" placeholder="e.g., Exam Study Group" />
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="act-location">Meeting Point</label>
+                  <input type="text" id="act-location" placeholder="Library Pod 1" />
+                </div>
+                <div class="form-group">
+                  <label for="act-time">Time</label>
+                  <input type="text" id="act-time" placeholder="Today, 17:00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="act-max">Max Participants</label>
+                <input type="number" id="act-max" min="1" max="50" value="5" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primary full-width">Publish to SLIDE</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- NOTIFICATIONS VIEW -->
+      <section id="notifications-view" class="app-view hidden">
+        <div class="section-header-row">
+          <h2>Activity & Notifications</h2>
+          <button class="btn-text" onclick="markAllNotificationsRead()">Mark all read</button>
+        </div>
+        <div id="notifications-list" class="notifications-list"></div>
+      </section>
+
+      <!-- PROFILE VIEW -->
+      <section id="profile-view" class="app-view hidden">
+        <div id="profile-container"></div>
+      </section>
+
+      <!-- MESSAGES VIEW -->
+      <section id="messages-view" class="app-view hidden">
+        <div class="section-header-row">
+          <button class="btn-text" onclick="openView('home-view')">← Back</button>
+          <h2>Private SLIDE Messages</h2>
+          <span></span>
+        </div>
+        <div id="dm-container" class="dm-layout"></div>
+      </section>
     </main>
 
-  </div>
-  <!-- ================= NOTIFICATIONS MODAL ================= -->
-  <div id="notificationModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div class="modal-card" style="background: var(--bg-main); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 440px; padding: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column;">
-      
-      <!-- Header -->
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
-        <h4 style="font-size: 16px; font-weight: 700;">Your Notifications</h4>
-        <button onclick="closeNotificationModal()" style="background:none; border:none; color:var(--text-main); cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
-      </div>
-
-      <!-- Notification List Stream -->
-      <div style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto;">
-        
-        <!-- Notification Item 1 -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: flex-start;">
-          <span style="font-size: 18px;">👋</span>
-          <div style="flex: 1;">
-            <p style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">Tefelo Mathabe & 11 others waved at your post</p>
-            <p style="font-size: 11px; color: var(--text-muted);">Working on the SLIDE interface prototype...</p>
-          </div>
-          <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap;">2m ago</span>
-        </div>
-
-        <!-- Notification Item 2 -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: flex-start;">
-          <span style="font-size: 18px;">📍</span>
-          <div style="flex: 1;">
-            <p style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">Activity Reminder: 5-a-Side Soccer</p>
-            <p style="font-size: 11px; color: var(--text-muted);">Res Quad Turf starting this Friday afternoon.</p>
-          </div>
-          <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap;">1h ago</span>
-        </div>
-
-        <!-- Notification Item 3 -->
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 12px; display: flex; gap: 12px; align-items: flex-start;">
-          <span style="font-size: 18px;">⚡</span>
-          <div style="flex: 1;">
-            <p style="font-size: 13px; font-weight: 600; margin-bottom: 2px;">System Boost Active</p>
-            <p style="font-size: 11px; color: var(--text-muted);">Your post has priority campus visibility for 20 mins.</p>
-          </div>
-          <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap;">3h ago</span>
-        </div>
-
-      </div>
-    </div>
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" onclick="openView('home-view', this)"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-btn" onclick="openView('search-view', this)"><span class="nav-icon">🔍</span><span class="nav-label">Search</span></button>
+      <button class="nav-btn" onclick="openView('create-view', this)"><span class="nav-icon">➕</span><span class="nav-label">Create</span></button>
+      <button class="nav-btn" onclick="openView('notifications-view', this)"><span class="nav-icon">🔔</span><span class="nav-label">Activity</span></button>
+      <button class="nav-btn" onclick="openView('profile-view', this)"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></button>
+    </nav>
   </div>
 
-  <!-- ================= USER PROFILE MODAL ================= -->
-  <div id="profileModal" class="modal-overlay">
-    <div class="modal-card" style="max-width: 480px; max-height: 85vh; display: flex; flex-direction: column;">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
-        <h4 id="profileModalTitle">Student Profile</h4>
-        <button onclick="closeProfileModal()" style="background:none; border:none; color:var(--text-main); cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
-      </div>
-      
-      <!-- Profile Header Info -->
-      <div id="profileHeaderInfo" style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
-        <!-- Populated dynamically -->
-      </div>
-
-      <!-- Interests & Tags -->
-      <div id="profileInterests" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
-        <!-- Populated dynamically -->
-      </div>
-
-      <!-- Tabs: Posts | Activities -->
-      <div style="display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px;">
-        <button id="tabPostsBtn" onclick="switchProfileTab('posts')" style="flex:1; background:none; border:none; padding:10px; font-weight:600; cursor:pointer; color:var(--accent); border-bottom: 2px solid var(--accent);">Posts</button>
-        <button id="tabActsBtn" onclick="switchProfileTab('activities')" style="flex:1; background:none; border:none; padding:10px; font-weight:600; cursor:pointer; color:var(--text-muted);">Activities</button>
-      </div>
-
-      <!-- Tab Content Stream -->
-      <div id="profileTabContent" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; max-height: 300px; padding-right: 4px;">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- ================= CREATE POST / ACTIVITY MODAL ================= -->
-  <div id="createModal" class="modal-overlay">
+  <!-- MODALS -->
+  <div id="comments-modal" class="modal hidden">
     <div class="modal-card">
-      <h3>Create Campus Content</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:16px;">Share a visual moment or organize a student activity.</p>
-      
-      <form id="createForm">
-        <div class="form-group">
-          <label>ContentType</label>
-          <select id="contentType" onchange="toggleActivityFields()">
-            <option value="post">Standard Post</option>
-            <option value="activity">Campus Activity (Joinable Event)</option>
-          </select>
-        </div>
-
-     <!-- Inside your create post form modal -->
-     <div class="form-group" style="margin-bottom: 12px;">
-        <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Upload Image from Device</label>
-        <input type="file" id="postImageFile" accept="image/*" style="width: 100%; padding: 8px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; font-size: 12px; color: var(--text-main); cursor: pointer;">
-     </div>
-
-        <div class="form-group">
-          <label>Caption / Description</label>
-          <textarea id="postCaption" rows="3" placeholder="What are you sharing with your student community?" style="width:100%; padding:10px; background:var(--bg-primary); border:1px solid var(--border); color:var(--text-main); border-radius:6px;" required></textarea>
-        </div>
-
-        <!-- Dynamic Activity Fields -->
-        <div id="activityExtraFields" style="display:none; background:var(--bg-secondary); padding:12px; border-radius:6px; margin-bottom:16px;">
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-size:11px;">Event Venue / Location</label>
-            <input type="text" id="activityVenue" placeholder="e.g. Library Lab 3 or Res Quad">
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-size:11px;">Max Attendees</label>
-            <input type="number" id="activityLimit" placeholder="e.g. 20">
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px;">
-          <button type="button" class="action-btn" style="flex:1; justify-content:center;" onclick="closeCreateModal()">Cancel</button>
-          <button type="submit" class="btn-primary" style="flex:1;">Share to Feed</button>
-        </div>
+      <div class="modal-header"><h3>Discussion</h3><button class="close-btn" onclick="closeModal('comments-modal')">✕</button></div>
+      <div id="comments-list" class="comments-list"></div>
+      <form class="comment-form" onsubmit="submitComment(event)">
+        <input type="text" id="comment-input" placeholder="Add a comment..." required />
+        <button type="submit" class="btn-primary">Post</button>
       </form>
     </div>
   </div>
 
-  <!-- ================= PRIVATE CHAT MODAL ================= -->
-  <div id="chatModal" class="modal-overlay">
-    <div class="modal-card" style="max-width:400px; height:500px; display:flex; flex-direction:column;">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px;">
-        <h4 id="chatRecipientName">Private SLIDE Chat</h4>
-        <button onclick="closeChat()" style="background:none; border:none; color:var(--text-main); cursor:pointer; font-weight:bold;">✕</button>
+  <!-- SLIDE DIRECT MESSAGE MODAL (Standard Posts Only) -->
+  <div id="slide-dm-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📩 SLIDE into DMs</h3>
+        <button class="close-btn" onclick="closeModal('slide-dm-modal')">✕</button>
       </div>
-      <div id="chatMessages" style="flex:1; overflow-y:auto; padding:12px 0; display:flex; flex-direction:column; gap:8px;">
-        <!-- Chat bubbles rendered here -->
+      <div id="slide-dm-context" class="guide-item" style="margin-bottom:12px;"></div>
+      <form class="comment-form" onsubmit="submitSlideDm(event)">
+        <input type="text" id="slide-dm-input" placeholder="Write a private message about this post..." required />
+        <button type="submit" class="btn-primary">Send</button>
+      </form>
+    </div>
+  </div>
+  
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-header"><h3>Settings, Privacy & POPIA</h3><button class="close-btn" onclick="closeModal('settings-modal')">✕</button></div>
+      <div class="setting-item">
+        <div><strong>Allow Private Waves</strong><p class="muted-text">Receive private acknowledgements</p></div>
+        <input type="checkbox" id="set-waves" checked onchange="toggleSetting('allowWaves', this.checked)" />
       </div>
-      <div style="display:flex; gap:8px; border-top:1px solid var(--border); padding-top:12px;">
-        <input type="text" id="chatInput" placeholder="Type a private message..." style="flex:1; padding:8px; border:1px solid var(--border); border-radius:6px; background:var(--bg-primary); color:var(--text-main);">
-        <button class="btn-primary" style="width:auto; padding:8px 16px;" onclick="sendChatMessage()">Send</button>
+      <div class="setting-item">
+        <div><strong>Private Account Mode</strong><p class="muted-text">Restrict profile visibility</p></div>
+        <input type="checkbox" id="set-private" onchange="toggleSetting('isPrivate', this.checked)" />
       </div>
+      <button class="btn-secondary full-width" style="margin-top:12px;" onclick="exportUserData()">📥 Download POPIA Data (JSON)</button>
+      <button class="btn-danger full-width" style="margin-top:8px;" onclick="logoutUser()">Sign Out</button>
     </div>
   </div>
 
-  <!-- Toast Notification Container -->
-<div id="toastNotification" style="position: fixed; bottom: 20px; right: 20px; background: var(--text-main,#111); color: var(--bg-main,#fff); padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;"></div>
-  <!-- JAVASCRIPT MODULE ENTRY POINT -->
-  <script type="module" src="./js/app.js"></script>
+  <div id="admin-modal" class="modal hidden">
+    <div class="modal-card large-modal">
+      <div class="modal-header"><h3>🛡️ Moderation & Admin Console</h3><button class="close-btn" onclick="closeModal('admin-modal')">✕</button></div>
+      <div class="admin-stats-grid" id="admin-stats"></div>
+      <h4 style="margin:12px 0 8px;">Reported Content Queue</h4>
+      <div id="admin-reports-list" class="admin-queue"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
