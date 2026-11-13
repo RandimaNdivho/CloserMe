@@ -1,13 +1,12 @@
 const INITIAL_STATE = {
-  schemaVersion: "v4_no_preset_users",
+  schemaVersion: "v5_complete_production",
   registeredUsers: [],
   currentUser: null,
   posts: [
-    // ==================== SLIDE / DAY POSTS ====================
     {
       id: "p_day_1",
-      authorName: "Jason_Sports",
-      username: "Sports_fein",
+      authorName: "Campus Sports Hub",
+      username: "campus_sports",
       institution: "University of Limpopo",
       avatar: "Assets/Jason.jpg",
       image: "Assets/5 Football.jpg",
@@ -32,8 +31,8 @@ const INITIAL_STATE = {
     },
     {
       id: "p_day_2",
-      authorName: "Mbali Mbambathe",
-      username: "Mbali Mbambathe",
+      authorName: "Study Pod Collective",
+      username: "study_pods",
       institution: "IIE Varsity College",
       avatar: "Assets/Black Girl.jpg",
       image: "Assets/Library.jpg",
@@ -58,8 +57,8 @@ const INITIAL_STATE = {
       id: "p_day_3",
       authorName: "RI Campus Media",
       username: "ri_media",
-      institution: "IIE Varsity College",
-      avatar: "Assets/RI.jpg",
+      institution: "University of Pretoria",
+      avatar: "Assets/View Guy.jpg",
       image: "Assets/RI.jpg",
       alt: "Campus photography showcase",
       caption: "Daytime around the quad between lectures. Drop a Wave if you're on campus today.",
@@ -71,14 +70,12 @@ const INITIAL_STATE = {
       comments: [],
       activity: null
     },
-
-    // ==================== SLIDE / RES NIGHTS POSTS ====================
     {
-      id: "p_night_4",
-      authorName: "Mbali Mbambathe",
-      username: "Mbali Mbambathe",
-      institution: "IIE Varsity College",
-      avatar: "Assets/Black Girl.jpg",
+      id: "p_night_1",
+      authorName: "Res Life Committee",
+      username: "res_nights_hq",
+      institution: "University of Johannesburg",
+      avatar: "Assets/Me.jpg",
       image: "Assets/Girls Night.png",
       alt: "Students celebrating at an evening residence social",
       caption: "Res Nights rooftop social & games night! Pull through with your floor mates 🌙✨",
@@ -98,11 +95,11 @@ const INITIAL_STATE = {
       }
     },
     {
-      id: "p_night_4",
-      authorName: "Jason_Randima",
-      username: "Jason_Randima",
+      id: "p_night_2",
+      authorName: "Campus Drama Society",
+      username: "campus_drama",
       institution: "Wits University",
-      avatar: "Assets/Jason.jpg",
+      avatar: "Assets/View Guy.jpg",
       image: "Assets/Drama.webp",
       alt: "Stage lighting in university auditorium",
       caption: "Tonight's late open-mic rehearsal in the Main Auditorium has been postponed due to sound equipment maintenance.",
@@ -122,7 +119,7 @@ const INITIAL_STATE = {
       }
     },
     {
-      id: "p_night_4",
+      id: "p_night_3",
       authorName: "24Hr Lab Crew",
       username: "night_owls",
       institution: "University of Limpopo",

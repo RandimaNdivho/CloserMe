@@ -9,7 +9,7 @@
 <body class="day-mode">
   <div id="toast-container" aria-live="polite"></div>
 
-  <!-- 1. AUTHENTICATION SCREEN (Starts active, zero preset credentials) -->
+  <!-- AUTHENTICATION SCREEN -->
   <section id="auth-screen" class="screen active">
     <div class="auth-card">
       <div class="auth-brand">
@@ -74,7 +74,7 @@
     </div>
   </section>
 
-  <!-- 2. ONBOARDING WIZARD -->
+  <!-- ONBOARDING WIZARD -->
   <section id="onboarding-screen" class="screen">
     <div class="auth-card">
       <div class="onboarding-header">
@@ -150,7 +150,7 @@
     </div>
   </section>
 
-  <!-- 3. MAIN APP SHELL (Hidden until user authenticates) -->
+  <!-- MAIN APP SHELL -->
   <div id="app-shell" class="hidden">
     <header class="top-header">
       <button id="res-nights-toggle" class="brand-wordmark" onclick="toggleResNights()" title="Switch between SLIDE Day and SLIDE Res Nights">
@@ -276,7 +276,7 @@
       <section id="messages-view" class="app-view hidden">
         <div class="section-header-row">
           <button class="btn-text" onclick="openView('home-view')">← Back</button>
-          <h2>Private SLIDE Messages</h2>
+          <h2>Private SLIDE Messages & DMs</h2>
           <span></span>
         </div>
         <div id="dm-container" class="dm-layout"></div>
@@ -305,7 +305,6 @@
     </div>
   </div>
 
-  <!-- SLIDE DIRECT MESSAGE MODAL (Standard Posts Only) -->
   <div id="slide-dm-modal" class="modal hidden">
     <div class="modal-card">
       <div class="modal-header">
@@ -319,20 +318,89 @@
       </form>
     </div>
   </div>
-  
-  <div id="settings-modal" class="modal hidden">
+
+  <div id="edit-profile-modal" class="modal hidden">
     <div class="modal-card">
-      <div class="modal-header"><h3>Settings, Privacy & POPIA</h3><button class="close-btn" onclick="closeModal('settings-modal')">✕</button></div>
-      <div class="setting-item">
-        <div><strong>Allow Private Waves</strong><p class="muted-text">Receive private acknowledgements</p></div>
-        <input type="checkbox" id="set-waves" checked onchange="toggleSetting('allowWaves', this.checked)" />
+      <div class="modal-header">
+        <h3>Edit Student Profile</h3>
+        <button class="close-btn" onclick="closeModal('edit-profile-modal')">✕</button>
       </div>
-      <div class="setting-item">
-        <div><strong>Private Account Mode</strong><p class="muted-text">Restrict profile visibility</p></div>
-        <input type="checkbox" id="set-private" onchange="toggleSetting('isPrivate', this.checked)" />
+      <form id="edit-profile-form" onsubmit="saveProfileChanges(event)">
+        <div class="form-group">
+          <label for="edit-avatar">Profile Picture</label>
+          <select id="edit-avatar">
+            <option value="Assets/Me.jpg">Portrait 1 (Assets/Me.jpg)</option>
+            <option value="Assets/Black Girl.jpg">Portrait 2 (Assets/Black Girl.jpg)</option>
+            <option value="Assets/Jason.jpg">Portrait 3 (Assets/Jason.jpg)</option>
+            <option value="Assets/View Guy.jpg">Portrait 4 (Assets/View Guy.jpg)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-name">Display Name</label>
+          <input type="text" id="edit-name" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-course">Course / Field of Study</label>
+          <input type="text" id="edit-course" required />
+        </div>
+        <div class="form-group">
+          <label for="edit-bio">Bio</label>
+          <textarea id="edit-bio" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn-primary full-width">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-card large-modal">
+      <div class="modal-header">
+        <h3>⚙️ Settings, Privacy & POPIA</h3>
+        <button class="close-btn" onclick="closeModal('settings-modal')">✕</button>
       </div>
-      <button class="btn-secondary full-width" style="margin-top:12px;" onclick="exportUserData()">📥 Download POPIA Data (JSON)</button>
-      <button class="btn-danger full-width" style="margin-top:8px;" onclick="logoutUser()">Sign Out</button>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div>
+          <h4 style="margin-bottom:8px; color:var(--accent);">Account & Security</h4>
+          <div class="setting-item">
+            <div><strong>Institutional Affiliation</strong><p class="muted-text">Verified via .ac.za / .edu.za domain</p></div>
+            <span class="badge-pill">Verified Active</span>
+          </div>
+          <div class="setting-item">
+            <div><strong>Two-Factor Authentication (2FA)</strong><p class="muted-text">Protect login sessions</p></div>
+            <input type="checkbox" id="set-2fa" onchange="toggleSetting('twoFactor', this.checked)" />
+          </div>
+          <div class="setting-item">
+            <div><strong>Login Alerts</strong><p class="muted-text">Notify on unfamiliar device access</p></div>
+            <input type="checkbox" id="set-alerts" checked onchange="toggleSetting('loginAlerts', this.checked)" />
+          </div>
+        </div>
+        <hr class="divider" style="margin:4px 0;" />
+        <div>
+          <h4 style="margin-bottom:8px; color:var(--accent);">Privacy & Interactions</h4>
+          <div class="setting-item">
+            <div><strong>Allow Private Waves</strong><p class="muted-text">Receive campus acknowledgements</p></div>
+            <input type="checkbox" id="set-waves" checked onchange="toggleSetting('allowWaves', this.checked)" />
+          </div>
+          <div class="setting-item">
+            <div><strong>Private Account Mode</strong><p class="muted-text">Hide activity from public campus search</p></div>
+            <input type="checkbox" id="set-private" onchange="toggleSetting('isPrivate', this.checked)" />
+          </div>
+          <div class="setting-item">
+            <div><strong>Read Receipts in DMs</strong><p class="muted-text">Show when you've read direct messages</p></div>
+            <input type="checkbox" id="set-read" checked onchange="toggleSetting('readReceipts', this.checked)" />
+          </div>
+        </div>
+        <hr class="divider" style="margin:4px 0;" />
+        <div>
+          <h4 style="margin-bottom:8px; color:var(--accent);">POPIA Data & Trust</h4>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn-secondary" style="flex:1;" onclick="exportUserData()">📥 Download POPIA Data (JSON)</button>
+            <button class="btn-secondary" style="flex:1;" onclick="showToast('Data retention policy: Active accounts retain data per POPIA guidelines.', 'info')">📜 View Privacy Terms</button>
+          </div>
+        </div>
+        <hr class="divider" style="margin:4px 0;" />
+        <button class="btn-danger full-width" onclick="logoutUser()">Sign Out of SLIDE</button>
+      </div>
     </div>
   </div>
 

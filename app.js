@@ -8,6 +8,7 @@ if (!state || state.schemaVersion !== INITIAL_STATE.schemaVersion) {
 let currentFilter = "all";
 let isResNights = false;
 let activeCommentPostId = null;
+let activeSlidePostId = null;
 
 function saveState() {
   localStorage.setItem("SLIDE_APP_STATE", JSON.stringify(state));
@@ -27,7 +28,7 @@ function safeAssetPath(path) {
   return encodeURI(path);
 }
 
-/* ==================== 1. AUTHENTICATION & ONBOARDING ==================== */
+/* ==================== AUTHENTICATION & ONBOARDING ==================== */
 function switchAuthTab(tab) {
   document.getElementById("tab-login").classList.toggle("active", tab === "login");
   document.getElementById("tab-signup").classList.toggle("active", tab === "signup");
@@ -126,7 +127,7 @@ function finishOnboarding() {
     bio,
     avatar,
     interests,
-    settings: { allowWaves: true, isPrivate: false }
+    settings: { allowWaves: true, isPrivate: false, twoFactor: false, loginAlerts: true, readReceipts: true }
   };
 
   state.registeredUsers.push(newUser);
@@ -177,7 +178,7 @@ function logoutUser() {
   showToast("Signed out securely.", "info");
 }
 
-/* ==================== 2. NAVIGATION & SLIDE / RES NIGHTS ==================== */
+/* ==================== NAVIGATION & RES NIGHTS ==================== */
 function openView(viewId, navBtn = null) {
   document.querySelectorAll(".app-view").forEach(v => v.classList.add("hidden"));
   const target = document.getElementById(viewId);
@@ -203,7 +204,7 @@ function toggleResNights() {
   showToast(isResNights ? "🌙 Switched to SLIDE / Res Nights" : "☀️ Switched to SLIDE / Day", "info");
 }
 
-/* ==================== 3. HOME FEED & ASSETS ==================== */
+/* ==================== HOME FEED & ASSETS ==================== */
 function renderStories() {
   const bar = document.getElementById("stories-bar");
   if (!bar) return;
@@ -234,7 +235,6 @@ function renderFeed() {
     boostSpot.innerHTML = "";
   }
 
-  // Strictly separates SLIDE / Day (isResNights: false) from SLIDE / Res Nights (isResNights: true)
   const filtered = state.posts.filter(p => {
     if (p.isResNights !== isResNights) return false;
     if (currentFilter === "activities" && !p.activity) return false;
@@ -311,7 +311,7 @@ function renderFeed() {
         </div>
 
         <div class="post-actions">
-        <div class="action-group">
+          <div class="action-group">
             <button class="act-btn ${post.waved ? 'waved' : ''}" onclick="sendWave('${post.id}')">
               👋 ${post.waved ? 'Waved' : 'Wave'}
             </button>
@@ -327,6 +327,10 @@ function renderFeed() {
               ⚡ ${isBoosted ? 'Boosted' : 'Boost'}
             </button>
           </div>
+          <button class="act-btn ${post.saved ? 'saved' : ''}" onclick="toggleSave('${post.id}')">
+            ${post.saved ? '🔖 Saved' : '🔖'}
+          </button>
+        </div>
       </article>`;
   }).join("");
 }
@@ -338,7 +342,7 @@ function setFeedFilter(filter, btn) {
   renderFeed();
 }
 
-/* ==================== 4. SIGNATURE MECHANICS ==================== */
+/* ==================== SIGNATURE MECHANICS ==================== */
 function sendWave(postId) {
   const post = state.posts.find(p => p.id === postId);
   if (!post) return;
@@ -410,7 +414,7 @@ function toggleJoinActivity(postId) {
   renderFeed();
 }
 
-/* ==================== 5. PUBLISHING, COMMENTS, SEARCH & PROFILE ==================== */
+/* ==================== PUBLISHING, COMMENTS, DMS & PROFILE ==================== */
 function switchCreateType(type) {
   document.getElementById("create-type-post").classList.toggle("active", type === "post");
   document.getElementById("create-type-activity").classList.toggle("active", type === "activity");
@@ -485,9 +489,10 @@ function submitComment(e) {
   renderFeed();
   showToast("Comment posted.");
 }
+
 function openSlideDm(postId) {
   const post = state.posts.find(p => p.id === postId);
-  if (!post || post.activity) return; // Guard: strictly unavailable on activity posts
+  if (!post || post.activity) return;
 
   activeSlidePostId = postId;
   document.getElementById("slide-dm-context").innerHTML = `
@@ -590,19 +595,57 @@ function renderProfile() {
     <div class="profile-header-card">
       <div class="profile-top">
         <img src="${safeAssetPath(u.avatar)}" class="profile-avatar-lg" alt="${u.displayName}" />
-        <div>
+        <div style="flex:1;">
           <h2>${u.displayName}</h2>
           <p class="muted-text">@${u.username} • ${u.institution}</p>
           <span class="badge-pill">${u.course}</span>
         </div>
+        <button class="btn-secondary" onclick="openEditProfileModal()">Edit Profile</button>
       </div>
       <p style="margin-top:12px;">${u.bio}</p>
       ${interestsHtml}
       <div class="profile-stats" style="margin-top:14px;">
-        <span><strong>${userPosts.length}</strong> Your Posts</span> •
+        <span><strong>${userPosts.length}</strong> Your Campus Posts</span> •
         <span>🔒 <strong>Zero Public Follower Clout</strong></span>
       </div>
+    </div>
+    <div class="card-panel">
+      <h3>Your Published Posts</h3>
+      <div style="margin-top:10px;">
+        ${userPosts.length ? userPosts.map(p => `
+          <div class="search-card" style="margin-bottom:8px;">
+            <span>${p.caption.slice(0, 50)}...</span>
+            <small class="muted-text">${p.timestamp}</small>
+          </div>
+        `).join("") : `<p class="muted-text">You haven't published any posts yet. Use the Create tab to share something!</p>`}
+      </div>
     </div>`;
+}
+
+function openEditProfileModal() {
+  const u = state.currentUser;
+  if (!u) return;
+  document.getElementById("edit-avatar").value = u.avatar;
+  document.getElementById("edit-name").value = u.displayName;
+  document.getElementById("edit-course").value = u.course;
+  document.getElementById("edit-bio").value = u.bio;
+  openModal("edit-profile-modal");
+}
+
+function saveProfileChanges(e) {
+  e.preventDefault();
+  const u = state.currentUser;
+  if (!u) return;
+
+  u.avatar = document.getElementById("edit-avatar").value;
+  u.displayName = document.getElementById("edit-name").value.trim();
+  u.course = document.getElementById("edit-course").value.trim();
+  u.bio = document.getElementById("edit-bio").value.trim();
+
+  saveState();
+  closeModal("edit-profile-modal");
+  renderProfile();
+  showToast("Profile updated successfully!");
 }
 
 function renderMessages() {
@@ -642,17 +685,6 @@ function renderMessages() {
   `).join("");
 }
 
-function sendDm(e) {
-  e.preventDefault();
-  const input = document.getElementById("dm-input");
-  const text = input.value.trim();
-  if (!text) return;
-  state.messages.push({ sender: state.currentUser.username, text, time: "Just now" });
-  input.value = "";
-  saveState();
-  renderMessages();
-}
-
 function reportPost(postId) {
   state.reports.unshift({
     id: "rep_" + Date.now(),
@@ -678,9 +710,11 @@ function openAdminConsole() {
 }
 
 function toggleSetting(key, val) {
-  state.currentUser.settings[key] = val;
-  saveState();
-  showToast("Privacy setting updated.");
+  if (state.currentUser && state.currentUser.settings) {
+    state.currentUser.settings[key] = val;
+    saveState();
+    showToast("Privacy setting updated.");
+  }
 }
 
 function exportUserData() {
